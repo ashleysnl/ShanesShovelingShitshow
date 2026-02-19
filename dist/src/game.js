@@ -1,15 +1,15 @@
 import { calculateShovelPoints, comboRank, plowIntervalMs, snowfallRate, plowSnowBurst } from './scoring.js';
 
-const WIDTH = 420;
+const WIDTH = 480;
 const HEIGHT = 640;
 
 const DRIVEWAY = {
-  x: 54,
-  y: 184,
-  width: 312,
-  height: 334,
+  x: 67,
+  y: 228,
+  width: 346,
+  height: 302,
   cols: 8,
-  rows: 10
+  rows: 9
 };
 
 const STATES = {
@@ -33,10 +33,10 @@ const WEATHER_TYPES = {
 };
 
 const WEATHER_CONFIG = {
-  [WEATHER_TYPES.CLEAR]: { snowMult: 0.8, wind: 0.12, tint: 0, label: 'CLEAR SKIES' },
-  [WEATHER_TYPES.FLURRY]: { snowMult: 1.15, wind: 0.35, tint: 0.02, label: 'LIGHT FLURRIES' },
-  [WEATHER_TYPES.WIND]: { snowMult: 1.35, wind: 1.1, tint: 0.04, label: 'WIND SHEAR' },
-  [WEATHER_TYPES.BLIZZARD]: { snowMult: 1.95, wind: 1.75, tint: 0.09, label: 'WHITEOUT BLIZZARD' }
+  [WEATHER_TYPES.CLEAR]: { snowMult: 0.7, wind: 0.12, tint: 0.0, label: 'CLEAR SKIES' },
+  [WEATHER_TYPES.FLURRY]: { snowMult: 1.45, wind: 0.7, tint: 0.04, label: 'HEAVY FLURRIES' },
+  [WEATHER_TYPES.WIND]: { snowMult: 1.9, wind: 1.8, tint: 0.08, label: 'GALE FORCE WIND' },
+  [WEATHER_TYPES.BLIZZARD]: { snowMult: 2.8, wind: 2.8, tint: 0.14, label: 'WHITEOUT BLIZZARD' }
 };
 
 const WEATHER_SEQUENCE = [
@@ -172,12 +172,12 @@ export class Game {
   }
 
   getHouseTop() {
-    // Taller top house profile while keeping it attached above the driveway.
-    return this.getHouseBottom() - 83;
+    // Keep house below marquee/HUD and above driveway.
+    return 108;
   }
 
   getHouseBottom() {
-    return DRIVEWAY.y - 6;
+    return DRIVEWAY.y - 4;
   }
 
   loadLeaderboard() {
@@ -288,11 +288,12 @@ export class Game {
 
     this.weather = {
       type: WEATHER_TYPES.CLEAR,
-      timer: randomRange(12, 18),
+      timer: randomRange(9, 15),
       intensity: WEATHER_CONFIG[WEATHER_TYPES.CLEAR].snowMult,
-      wind: WEATHER_CONFIG[WEATHER_TYPES.CLEAR].wind
+      wind: WEATHER_CONFIG[WEATHER_TYPES.CLEAR].wind,
+      direction: Math.random() > 0.5 ? 1 : -1
     };
-    this.weatherStreaks = Array.from({ length: 18 }, () => ({
+    this.weatherStreaks = Array.from({ length: 32 }, () => ({
       x: randomRange(0, WIDTH),
       y: randomRange(118, HEIGHT - 6),
       speed: randomRange(110, 220),
@@ -384,6 +385,12 @@ export class Game {
     this.player.x += movement.x * this.player.speed * dt;
     this.player.y += movement.y * this.player.speed * dt;
 
+    // Wind storms can push the player around for higher tension.
+    if (this.weather.wind > 0.85) {
+      const gust = this.weather.direction * this.weather.wind * 20 * dt;
+      this.player.x += gust;
+    }
+
     this.player.x = clamp(this.player.x, DRIVEWAY.x + 16, DRIVEWAY.x + DRIVEWAY.width - 16);
     this.player.y = clamp(this.player.y, DRIVEWAY.y + 16, DRIVEWAY.y + DRIVEWAY.height - 18);
 
@@ -418,14 +425,16 @@ export class Game {
       this.snowGrid[idx] = clamp(this.snowGrid[idx] + 0.5, 0, 10);
     }
 
+    const passiveInterval = this.weather.type === WEATHER_TYPES.BLIZZARD ? 0.95 : this.weather.type === WEATHER_TYPES.WIND ? 1.25 : 1.8;
     this.passiveSnowEvent += dt;
-    if (this.passiveSnowEvent > 1.9) {
+    if (this.passiveSnowEvent > passiveInterval) {
       this.passiveSnowEvent = 0;
-      const columns = 1 + Math.floor(Math.random() * 2);
+      const columns = 1 + Math.floor(Math.random() * 2) + (this.weather.type === WEATHER_TYPES.BLIZZARD ? 1 : 0);
       for (let i = 0; i < columns; i += 1) {
         const c = Math.floor(Math.random() * DRIVEWAY.cols);
         for (let r = 0; r < DRIVEWAY.rows; r += 1) {
-          const amount = Math.max(0.1, 0.25 - r * 0.015);
+          const baseAmount = Math.max(0.1, 0.25 - r * 0.015);
+          const amount = baseAmount * (0.65 + this.weather.intensity * 0.45);
           this.addSnow(c, r, amount);
         }
       }
@@ -441,7 +450,8 @@ export class Game {
       this.weather.type = nextType;
       this.weather.intensity = cfg.snowMult;
       this.weather.wind = cfg.wind;
-      this.weather.timer = randomRange(13, 22);
+      this.weather.direction = Math.random() > 0.5 ? 1 : -1;
+      this.weather.timer = randomRange(9, 16);
       this.callouts.push({ text: cfg.label, life: 1.1, color: '#d8f2ff', size: 22, style: 'brick' });
     }
   }
@@ -913,7 +923,6 @@ export class Game {
     ctx.translate(shakeX, shakeY);
 
     this.drawBackground();
-    this.drawWeatherOverlay();
     this.drawMarquee();
     this.drawStreet();
     this.drawHouse();
@@ -923,6 +932,7 @@ export class Game {
     this.drawHelpers();
     this.drawPlayer();
     this.drawPlow();
+    this.drawWeatherOverlay();
     this.drawParticles();
     this.drawTextFx();
 
@@ -1037,14 +1047,34 @@ export class Game {
       ctx.fillRect(0, 106, WIDTH, HEIGHT - 106);
     }
 
-    const streakAlpha = this.weather.type === WEATHER_TYPES.BLIZZARD ? 0.38 : this.weather.type === WEATHER_TYPES.WIND ? 0.3 : 0.18;
+    const streakAlpha = this.weather.type === WEATHER_TYPES.BLIZZARD ? 0.56 : this.weather.type === WEATHER_TYPES.WIND ? 0.42 : this.weather.type === WEATHER_TYPES.FLURRY ? 0.28 : 0.18;
     ctx.fillStyle = `rgba(245, 252, 255, ${streakAlpha})`;
     for (const streak of this.weatherStreaks) {
-      streak.x += this.weather.wind * streak.speed * this.fixedStep;
-      streak.y += streak.speed * 0.12 * this.fixedStep;
+      streak.x += this.weather.direction * this.weather.wind * streak.speed * this.fixedStep;
+      streak.y += streak.speed * (0.07 + this.weather.wind * 0.05) * this.fixedStep;
       if (streak.x > WIDTH + 14) streak.x = -14;
+      if (streak.x < -14) streak.x = WIDTH + 14;
       if (streak.y > HEIGHT + 8) streak.y = 112;
       ctx.fillRect(streak.x, streak.y, streak.size, 2);
+    }
+
+    // Strong visibility drop for storm surge conditions.
+    if (this.weather.type === WEATHER_TYPES.WIND || this.weather.type === WEATHER_TYPES.BLIZZARD) {
+      const pulseBase = this.weather.type === WEATHER_TYPES.BLIZZARD ? 0.26 : 0.14;
+      const pulseAmp = this.weather.type === WEATHER_TYPES.BLIZZARD ? 0.1 : 0.06;
+      const pulse = pulseBase + (Math.sin(performance.now() / 170) + 1) * pulseAmp;
+      ctx.fillStyle = `rgba(232, 245, 255, ${pulse})`;
+      ctx.fillRect(0, 106, WIDTH, HEIGHT - 106);
+
+      const dotAlpha = this.weather.type === WEATHER_TYPES.BLIZZARD ? 0.42 : 0.28;
+      const dotCount = this.weather.type === WEATHER_TYPES.BLIZZARD ? 120 : 70;
+      ctx.fillStyle = `rgba(248, 252, 255, ${dotAlpha})`;
+      for (let i = 0; i < dotCount; i += 1) {
+        const x = (i * 31 + (performance.now() * 0.18 * this.weather.direction)) % (WIDTH + 40) - 20;
+        const y = (i * 23 + performance.now() * 0.12) % (HEIGHT - 106) + 106;
+        const w = 2 + (i % 3);
+        ctx.fillRect(x, y, w, w);
+      }
     }
   }
 
@@ -1296,11 +1326,8 @@ export class Game {
     const houseHeight = Math.max(48, houseBottom - houseTop);
     const paintedHouse = this.getArt('house');
     if (paintedHouse) {
-      // House is now above driveway; attached at driveway top edge.
-      const pad = 4;
-      const houseX = DRIVEWAY.x - 56 + pad;
-      const houseW = DRIVEWAY.width + 112 - pad * 2;
-      ctx.drawImage(paintedHouse, houseX, houseTop, houseW, houseHeight);
+      // Fill full game width for a stronger scene composition.
+      ctx.drawImage(paintedHouse, 0, houseTop, WIDTH, houseHeight);
       return;
     }
 
