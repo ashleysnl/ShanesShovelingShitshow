@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" shape-rendering="crispEdges">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#1a3b73"/>
+      <stop offset="1" stop-color="#0f1f45"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="360" fill="url(#bg)"/>
+  <rect x="24" y="24" width="912" height="312" fill="none" stroke="#8cd0ff" stroke-width="8"/>
+  <g fill="#0a1430">
+    <rect x="70" y="68" width="830" height="88"/>
+    <rect x="120" y="170" width="730" height="70"/>
+    <rect x="180" y="248" width="610" height="52"/>
+  </g>
+  <g font-family="monospace" font-weight="900" text-anchor="middle">
+    <text x="480" y="128" font-size="72" fill="#ffef86">SHANES</text>
+    <text x="480" y="220" font-size="58" fill="#a8e7ff">SHOVELING</text>
+    <text x="480" y="288" font-size="46" fill="#ff8d64">ADVENTURE</text>
+  </g>
+  <g fill="#eaf7ff">
+    <rect x="80" y="42" width="14" height="14"/>
+    <rect x="860" y="42" width="14" height="14"/>
+    <rect x="120" y="302" width="14" height="14"/>
+    <rect x="820" y="302" width="14" height="14"/>
+  </g>
+</svg>

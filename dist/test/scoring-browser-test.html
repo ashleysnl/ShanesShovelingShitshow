@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scoring Browser Test</title>
+    <style>
+      body { font-family: sans-serif; padding: 16px; }
+      .ok { color: #0a7a0a; }
+      .fail { color: #b10000; }
+    </style>
+  </head>
+  <body>
+    <h1>Scoring Browser Test</h1>
+    <ul id="results"></ul>
+
+    <script type="module">
+      import {
+        calculateShovelPoints,
+        comboRank,
+        plowIntervalMs,
+        snowfallRate,
+        plowSnowBurst
+      } from '../src/scoring.js';
+
+      const tests = [
+        {
+          name: 'Risky combo scores much higher than base',
+          run: () => {
+            const base = calculateShovelPoints({ snowDepth: 1, combo: 1, nearPlow: false, frenzy: false });
+            const risky = calculateShovelPoints({ snowDepth: 1, combo: 20, nearPlow: true, frenzy: true });
+            return risky > base * 4;
+          }
+        },
+        {
+          name: 'Combo rank reaches BLIZZARD GOD tier',
+          run: () => comboRank(200) === 'BLIZZARD GOD'
+        },
+        {
+          name: 'Difficulty ramps over time',
+          run: () => plowIntervalMs(0) > plowIntervalMs(120000) && snowfallRate(90000) > snowfallRate(0) && plowSnowBurst(100000) > plowSnowBurst(0)
+        }
+      ];
+
+      const list = document.querySelector('#results');
+      let passCount = 0;
+
+      tests.forEach((t) => {
+        const li = document.createElement('li');
+        const passed = Boolean(t.run());
+        li.className = passed ? 'ok' : 'fail';
+        li.textContent = `${passed ? 'PASS' : 'FAIL'} - ${t.name}`;
+        list.appendChild(li);
+        if (passed) passCount += 1;
+      });
+
+      const summary = document.createElement('p');
+      summary.textContent = `${passCount}/${tests.length} tests passed.`;
+      summary.className = passCount === tests.length ? 'ok' : 'fail';
+      document.body.appendChild(summary);
+    </script>
+  </body>
+</html>

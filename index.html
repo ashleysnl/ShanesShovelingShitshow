@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>SHANE'S SHOVELING SHITSHOW</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="hud" aria-label="Scoreboard">
+        <div class="hud-card">
+          <span class="hud-label">Score</span>
+          <span class="hud-value" data-score>0</span>
+        </div>
+        <div class="hud-card">
+          <span class="hud-label">Combo</span>
+          <span class="hud-value" data-combo>0x</span>
+        </div>
+        <div class="hud-card">
+          <span class="hud-label">Wave</span>
+          <span class="hud-value" data-wave>1</span>
+        </div>
+        <div class="hud-card">
+          <span class="hud-label">Lives</span>
+          <span class="hud-value" data-lives>3</span>
+        </div>
+      </header>
+
+      <section class="canvas-shell">
+        <canvas id="game-canvas" width="360" height="640" aria-label="Game canvas"></canvas>
+
+        <section class="overlay" id="title-screen">
+          <h1 class="title-logo">SHANE'S SHOVELING SHITSHOW</h1>
+          <p class="subtitle">Clear fast. Dodge plows. Chain insane combos.</p>
+          <button class="primary-btn" data-start>Start Run</button>
+          <p class="hint">Tap start once to unlock audio on iPhone.</p>
+        </section>
+
+        <section class="overlay is-hidden" id="pause-screen">
+          <h2>Paused</h2>
+          <button class="primary-btn" data-resume>Resume</button>
+        </section>
+
+        <section class="overlay is-hidden" id="game-over-screen">
+          <h2>Game Over</h2>
+          <p>Score: <strong data-final-score>0</strong></p>
+          <p>Best Combo: <strong data-final-combo>0</strong></p>
+          <button class="primary-btn" data-restart>Run It Back</button>
+        </section>
+      </section>
+
+      <section class="status-strip">
+        <div class="status-item">
+          <span class="status-label">Rank</span>
+          <span class="status-value" data-rank>WARMING UP</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">High Score</span>
+          <span class="status-value" data-high-score>0</span>
+        </div>
+      </section>
+
+      <section class="controls" aria-label="Touch controls">
+        <button class="joystick" data-joystick aria-label="Move joystick">
+          <span class="joystick-knob"></span>
+        </button>
+
+        <div class="control-stack">
+          <button class="action-btn" data-action aria-label="Shovel action">SHOVEL</button>
+          <div class="row">
+            <button class="mini-btn" data-pause aria-label="Pause game">Pause</button>
+            <button class="mini-btn" data-mute>Mute</button>
+          </div>
+          <label class="volume-wrap">
+            <span>Volume</span>
+            <input data-volume type="range" min="0" max="1" step="0.05" value="0.85" />
+          </label>
+        </div>
+      </section>
+
+      <footer class="desktop-help">
+        Desktop: <kbd>WASD / Arrows</kbd> move, <kbd>Space</kbd> shovel, <kbd>P</kbd> pause, mouse drag on canvas to steer.
+      </footer>
+    </main>
+
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>

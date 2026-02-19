@@ -1,0 +1,11 @@
+{
+  "name": "shanes-shoveling-adventure",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/static-server.js",
+    "build": "node scripts/build.js",
+    "test": "node --test"
+  }
+}
