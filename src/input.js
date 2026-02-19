@@ -21,6 +21,14 @@ export class InputController {
 
   bind() {
     window.addEventListener('keydown', (event) => {
+      const target = event.target;
+      const isTypingField = target instanceof HTMLElement && (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      );
+      if (isTypingField) return;
+
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD', 'Space', 'KeyP', 'Escape'].includes(event.code)) {
         event.preventDefault();
       }
@@ -30,6 +38,14 @@ export class InputController {
     }, { passive: false });
 
     window.addEventListener('keyup', (event) => {
+      const target = event.target;
+      const isTypingField = target instanceof HTMLElement && (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      );
+      if (isTypingField) return;
+
       this.keys.delete(event.code);
       if (event.code === 'Space') this.actionHeld = false;
     });

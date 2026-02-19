@@ -36,6 +36,9 @@
         <canvas id="game-canvas" width="360" height="640" aria-label="Game canvas"></canvas>
 
         <section class="overlay" id="title-screen">
+          <div class="title-shane-wrap" aria-hidden="true">
+            <img class="title-shane" src="assets/Shane-Head.PNG" alt="" />
+          </div>
           <h1 class="title-logo">SHANE'S SHOVELING SHITSHOW</h1>
           <p class="subtitle">Clear fast. Dodge plows. Chain insane combos.</p>
           <button class="primary-btn" data-start>Start Run</button>
@@ -51,6 +54,28 @@
           <h2>Game Over</h2>
           <p>Score: <strong data-final-score>0</strong></p>
           <p>Best Combo: <strong data-final-combo>0</strong></p>
+          <div class="leaderboard-entry is-hidden" data-leaderboard-entry>
+            <p class="leaderboard-entry-title">NEW TOP 5! ENTER INITIALS</p>
+            <div class="leaderboard-entry-row">
+              <input
+                type="text"
+                maxlength="3"
+                inputmode="text"
+                autocapitalize="characters"
+                autocorrect="off"
+                autocomplete="off"
+                spellcheck="false"
+                data-initials-input
+                aria-label="Enter initials"
+                placeholder="AAA"
+              />
+              <button class="primary-btn leaderboard-submit" data-submit-score>Save</button>
+            </div>
+          </div>
+          <div class="leaderboard-panel">
+            <p class="leaderboard-title">HIGH SCORES</p>
+            <ol class="leaderboard-list" data-leaderboard-list></ol>
+          </div>
           <button class="primary-btn" data-restart>Run It Back</button>
         </section>
       </section>

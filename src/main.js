@@ -22,6 +22,10 @@ const overlays = {
   resumeButton: document.querySelector('[data-resume]'),
   finalScore: document.querySelector('[data-final-score]'),
   finalBestCombo: document.querySelector('[data-final-combo]'),
+  leaderboardEntry: document.querySelector('[data-leaderboard-entry]'),
+  initialsInput: document.querySelector('[data-initials-input]'),
+  submitScoreButton: document.querySelector('[data-submit-score]'),
+  leaderboardList: document.querySelector('[data-leaderboard-list]'),
   muteToggle: document.querySelector('[data-mute]'),
   volumeSlider: document.querySelector('[data-volume]')
 };
